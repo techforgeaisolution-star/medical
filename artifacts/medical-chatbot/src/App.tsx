@@ -49,14 +49,44 @@ async function deleteSession(id: string): Promise<void> {
   const r = await fetch(`${API}/chat/sessions/${id}`, { method: "DELETE" });
   if (!r.ok) throw new Error("Failed to delete session");
 }
-async function sendMessage(sessionId: string, content: string): Promise<ChatMessage> {
-  const r = await fetch(`${API}/chat/sessions/${sessionId}/messages`, {
+
+// SSE streaming message sender — returns an async iterator of content chunks
+async function* streamMessage(sessionId: string, content: string): AsyncGenerator<{ chunk?: string; done?: boolean; message?: ChatMessage; error?: string }> {
+  const response = await fetch(`${API}/chat/sessions/${sessionId}/messages`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ content }),
   });
-  if (!r.ok) throw new Error("Failed to send message");
-  return r.json();
+
+  if (!response.ok) {
+    yield { error: "Failed to send message", done: true };
+    return;
+  }
+
+  const reader = response.body!.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.content) yield { chunk: data.content };
+          if (data.done) yield { done: true, message: data.message, error: data.error };
+        } catch {
+          // ignore parse errors
+        }
+      }
+    }
+  }
 }
 
 // ---- Icons ----
@@ -105,13 +135,6 @@ function CloseIcon() {
     </svg>
   );
 }
-function HeartIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none">
-      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-    </svg>
-  );
-}
 
 // ---- Typing Indicator ----
 function TypingIndicator() {
@@ -132,7 +155,7 @@ function TypingIndicator() {
 }
 
 // ---- Message Bubble ----
-function MessageBubble({ msg }: { msg: ChatMessage }) {
+function MessageBubble({ msg, streaming = false }: { msg: ChatMessage; streaming?: boolean }) {
   const isBot = msg.role === "bot";
   return (
     <div className={`message-animate flex items-end gap-2 mb-4 ${isBot ? "" : "flex-row-reverse"}`}>
@@ -146,11 +169,7 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         </div>
       )}
       <div
-        className={`max-w-[72%] px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${
-          isBot
-            ? "rounded-bl-md"
-            : "rounded-br-md"
-        }`}
+        className={`max-w-[72%] px-4 py-3 rounded-2xl shadow-sm text-sm leading-relaxed whitespace-pre-wrap ${isBot ? "rounded-bl-md" : "rounded-br-md"}`}
         style={
           isBot
             ? { background: "hsl(210 100% 95%)", color: "hsl(210 100% 20%)" }
@@ -158,9 +177,12 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
         }
       >
         {msg.content}
-        <div className={`text-xs mt-1.5 opacity-50 ${isBot ? "text-left" : "text-right"}`}>
-          {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-        </div>
+        {streaming && <span className="inline-block w-0.5 h-4 bg-current ml-0.5 animate-pulse align-middle" />}
+        {!streaming && (
+          <div className={`text-xs mt-1.5 opacity-50 ${isBot ? "text-left" : "text-right"}`}>
+            {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -169,10 +191,10 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
 // ---- Empty State ----
 function EmptyState({ onQuickStart }: { onQuickStart: (text: string) => void }) {
   const quickStarts = [
-    { label: "Check my symptoms", icon: "🩺" },
-    { label: "Diabetes risk factors", icon: "🩸" },
-    { label: "Heart health tips", icon: "❤️" },
-    { label: "Parkinson's symptoms", icon: "🧠" },
+    { label: "What are the symptoms of diabetes?", icon: "🩸" },
+    { label: "How can I improve my heart health?", icon: "❤️" },
+    { label: "What are early signs of Parkinson's?", icon: "🧠" },
+    { label: "How do I lower my blood pressure?", icon: "💉" },
   ];
   return (
     <div className="flex flex-col items-center justify-center h-full gap-6 px-4 text-center">
@@ -185,7 +207,7 @@ function EmptyState({ onQuickStart }: { onQuickStart: (text: string) => void }) 
           Ask me about health conditions, symptoms, medications, or get a risk assessment.
         </p>
       </div>
-      <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
+      <div className="grid grid-cols-2 gap-2 w-full max-w-sm">
         {quickStarts.map((q) => (
           <button
             key={q.label}
@@ -221,9 +243,9 @@ function SidebarContent({
 }) {
   const quickDiagnostics = [
     { label: "Check my symptoms", icon: "🩺" },
-    { label: "Diabetes risk?", icon: "🩸" },
+    { label: "Diabetes risk factors", icon: "🩸" },
     { label: "Heart health tips", icon: "❤️" },
-    { label: "Medication info", icon: "💊" },
+    { label: "Medication information", icon: "💊" },
   ];
 
   function formatDate(iso: string) {
@@ -328,7 +350,7 @@ function SidebarContent({
       {/* Disclaimer */}
       <div className="px-4 py-3 border-t border-border">
         <p className="text-xs text-muted-foreground leading-snug">
-          <HeartIcon /> For informational use only. Always consult a qualified healthcare professional.
+          For informational use only. Always consult a qualified healthcare professional.
         </p>
       </div>
     </div>
@@ -340,16 +362,18 @@ function ChatApp() {
   const qc = useQueryClient();
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [streamingMessage, setStreamingMessage] = useState<ChatMessage | null>(null);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<boolean>(false);
 
   const { data: sessions = [] } = useQuery({
     queryKey: ["sessions"],
     queryFn: fetchSessions,
-    refetchInterval: 10000,
+    refetchInterval: 8000,
   });
 
   const { data: sessionData } = useQuery({
@@ -366,16 +390,7 @@ function ChatApp() {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
-
-  const createSessionMut = useMutation({
-    mutationFn: (title: string) => createSession(title),
-    onSuccess: (s) => {
-      qc.invalidateQueries({ queryKey: ["sessions"] });
-      setActiveSessionId(s.id);
-      setMessages([]);
-    },
-  });
+  }, [messages, streamingMessage]);
 
   const deleteSessionMut = useMutation({
     mutationFn: (id: string) => deleteSession(id),
@@ -388,63 +403,95 @@ function ChatApp() {
     },
   });
 
-  const sendMut = useMutation({
-    mutationFn: ({ sessionId, content }: { sessionId: string; content: string }) =>
-      sendMessage(sessionId, content),
-    onSuccess: (botMsg) => {
-      setIsTyping(false);
-      setMessages((prev) => [...prev, botMsg]);
-      qc.invalidateQueries({ queryKey: ["sessions"] });
-      qc.invalidateQueries({ queryKey: ["session", activeSessionId] });
-    },
-    onError: () => setIsTyping(false),
-  });
-
   const handleSend = useCallback(async (text?: string) => {
     const content = (text ?? input).trim();
-    if (!content || isTyping) return;
+    if (!content || isStreaming) return;
+
     setInput("");
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
 
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
-
-    // Optimistically add user message
-    const tempUserMsg: ChatMessage = {
-      id: `temp-${Date.now()}`,
+    // User message shown immediately
+    const tempId = `temp-${Date.now()}`;
+    const userMsg: ChatMessage = {
+      id: tempId,
       sessionId: activeSessionId ?? "",
       role: "user",
       content,
       createdAt: new Date().toISOString(),
     };
-    setMessages((prev) => [...prev, tempUserMsg]);
-    setIsTyping(true);
+    setMessages((prev) => [...prev, userMsg]);
+    setIsStreaming(true);
+    abortRef.current = false;
 
     let sessionId = activeSessionId;
 
     if (!sessionId) {
-      const title = content.length > 40 ? content.substring(0, 40) + "…" : content;
-      const newSession = await createSession(title);
-      qc.invalidateQueries({ queryKey: ["sessions"] });
-      setActiveSessionId(newSession.id);
-      sessionId = newSession.id;
-      // Small delay for typing feel
-      await new Promise((r) => setTimeout(r, 600));
-    } else {
-      await new Promise((r) => setTimeout(r, 800));
+      const title = content.length > 50 ? content.substring(0, 50) + "…" : content;
+      try {
+        const newSession = await createSession(title);
+        qc.invalidateQueries({ queryKey: ["sessions"] });
+        setActiveSessionId(newSession.id);
+        sessionId = newSession.id;
+      } catch {
+        setIsStreaming(false);
+        return;
+      }
     }
 
-    sendMut.mutate({ sessionId, content });
-  }, [input, activeSessionId, isTyping, sendMut, qc]);
+    // Start streaming bot response
+    const streamMsg: ChatMessage = {
+      id: `stream-${Date.now()}`,
+      sessionId,
+      role: "bot",
+      content: "",
+      createdAt: new Date().toISOString(),
+    };
+    setStreamingMessage(streamMsg);
+
+    try {
+      for await (const event of streamMessage(sessionId, content)) {
+        if (abortRef.current) break;
+
+        if (event.chunk) {
+          setStreamingMessage((prev) =>
+            prev ? { ...prev, content: prev.content + event.chunk } : prev
+          );
+        }
+
+        if (event.done) {
+          setStreamingMessage(null);
+          if (event.message) {
+            setMessages((prev) => {
+              // Replace temp user msg with server-confirmed messages
+              const withoutTemp = prev.filter((m) => m.id !== tempId);
+              return [...withoutTemp, event.message!];
+            });
+          }
+          qc.invalidateQueries({ queryKey: ["sessions"] });
+          qc.invalidateQueries({ queryKey: ["session", sessionId] });
+          break;
+        }
+      }
+    } catch {
+      setStreamingMessage(null);
+    } finally {
+      setIsStreaming(false);
+    }
+  }, [input, activeSessionId, isStreaming, qc]);
 
   function handleSelectSession(id: string) {
+    if (isStreaming) return;
     setActiveSessionId(id);
+    setMessages([]);
+    setStreamingMessage(null);
     setSidebarOpen(false);
   }
 
   function handleNewChat() {
+    if (isStreaming) return;
     setActiveSessionId(null);
     setMessages([]);
+    setStreamingMessage(null);
     setSidebarOpen(false);
   }
 
@@ -464,6 +511,7 @@ function ChatApp() {
 
   const activeSession = sessions.find((s) => s.id === activeSessionId);
   const sessionTitle = activeSession?.title ?? "New Conversation";
+  const allMessages = streamingMessage ? [...messages, streamingMessage] : messages;
 
   return (
     <div className="h-screen w-screen flex overflow-hidden relative">
@@ -515,7 +563,8 @@ function ChatApp() {
           </div>
           <button
             onClick={handleNewChat}
-            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white"
+            disabled={isStreaming}
+            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white disabled:opacity-50"
             style={{ background: "hsl(210 100% 50%)" }}
           >
             <PlusIcon />
@@ -526,14 +575,21 @@ function ChatApp() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto chat-scroll px-4 py-4 flex flex-col">
           <div className="max-w-2xl w-full mx-auto flex-1 flex flex-col">
-            {messages.length === 0 && !isTyping ? (
+            {allMessages.length === 0 && !isStreaming ? (
               <EmptyState onQuickStart={(text) => handleSend(text)} />
             ) : (
               <div className="flex flex-col justify-end flex-1 pt-4">
                 {messages.map((msg) => (
                   <MessageBubble key={msg.id} msg={msg} />
                 ))}
-                {isTyping && <TypingIndicator />}
+                {streamingMessage && (
+                  <MessageBubble
+                    key="streaming"
+                    msg={streamingMessage}
+                    streaming={streamingMessage.content.length > 0}
+                  />
+                )}
+                {isStreaming && !streamingMessage?.content && <TypingIndicator />}
                 <div ref={chatEndRef} />
               </div>
             )}
@@ -549,16 +605,16 @@ function ChatApp() {
                 value={input}
                 onChange={handleTextareaInput}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask me about health conditions, symptoms…"
+                placeholder={isStreaming ? "MedBot is responding…" : "Ask me about health conditions, symptoms…"}
                 rows={1}
-                disabled={isTyping}
-                className="w-full resize-none px-4 py-3 pr-4 rounded-2xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 transition-shadow leading-relaxed"
+                disabled={isStreaming}
+                className="w-full resize-none px-4 py-3 pr-4 rounded-2xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-shadow leading-relaxed"
                 style={{ maxHeight: "120px", minHeight: "48px" }}
               />
             </div>
             <button
               onClick={() => handleSend()}
-              disabled={!input.trim() || isTyping}
+              disabled={!input.trim() || isStreaming}
               className="send-btn w-12 h-12 rounded-2xl flex items-center justify-center text-white disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 transition-all"
               style={{ background: "hsl(210 100% 50%)" }}
             >
@@ -567,7 +623,7 @@ function ChatApp() {
           </div>
           <div className="max-w-2xl mx-auto mt-1.5">
             <p className="text-center text-xs text-muted-foreground opacity-60">
-              Enter to send · Shift+Enter for newline · For informational use only
+              Powered by OpenAI · Enter to send · Shift+Enter for newline
             </p>
           </div>
         </div>
