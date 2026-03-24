@@ -1,15 +1,16 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: HealthPredict AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: predictions
+    description: Disease prediction operations
 paths:
   /healthz:
     get:
@@ -24,6 +25,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /predictions/diabetes:
+    post:
+      operationId: predictDiabetes
+      tags: [predictions]
+      summary: Predict diabetes risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DiabetesInput"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+  /predictions/heart:
+    post:
+      operationId: predictHeart
+      tags: [predictions]
+      summary: Predict heart disease risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HeartInput"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+  /predictions/parkinsons:
+    post:
+      operationId: predictParkinsons
+      tags: [predictions]
+      summary: Predict Parkinson's disease risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParkinsonsInput"
+      responses:
+        "200":
+          description: Prediction result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PredictionResult"
+  /predictions/history:
+    get:
+      operationId: getPredictionHistory
+      tags: [predictions]
+      summary: Get prediction history
+      responses:
+        "200":
+          description: List of past predictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PredictionRecord"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +102,196 @@ components:
           type: string
       required:
         - status
-
+    DiabetesInput:
+      type: object
+      properties:
+        pregnancies:
+          type: number
+          description: Number of pregnancies
+        glucose:
+          type: number
+          description: Plasma glucose concentration (mg/dL)
+        bloodPressure:
+          type: number
+          description: Diastolic blood pressure (mm Hg)
+        skinThickness:
+          type: number
+          description: Triceps skin fold thickness (mm)
+        insulin:
+          type: number
+          description: 2-Hour serum insulin (mu U/ml)
+        bmi:
+          type: number
+          description: Body mass index
+        diabetesPedigreeFunction:
+          type: number
+          description: Diabetes pedigree function
+        age:
+          type: number
+          description: Age in years
+      required:
+        - pregnancies
+        - glucose
+        - bloodPressure
+        - skinThickness
+        - insulin
+        - bmi
+        - diabetesPedigreeFunction
+        - age
+    HeartInput:
+      type: object
+      properties:
+        age:
+          type: number
+          description: Age in years
+        sex:
+          type: number
+          description: Sex (1 = male, 0 = female)
+        chestPainType:
+          type: number
+          description: Chest pain type (0-3)
+        restingBP:
+          type: number
+          description: Resting blood pressure (mm Hg)
+        cholesterol:
+          type: number
+          description: Serum cholesterol (mg/dl)
+        fastingBS:
+          type: number
+          description: Fasting blood sugar > 120 mg/dl (1 = true, 0 = false)
+        restingECG:
+          type: number
+          description: Resting ECG results (0-2)
+        maxHR:
+          type: number
+          description: Maximum heart rate achieved
+        exerciseAngina:
+          type: number
+          description: Exercise induced angina (1 = yes, 0 = no)
+        oldpeak:
+          type: number
+          description: ST depression induced by exercise
+        stSlope:
+          type: number
+          description: Slope of peak exercise ST segment (0-2)
+      required:
+        - age
+        - sex
+        - chestPainType
+        - restingBP
+        - cholesterol
+        - fastingBS
+        - restingECG
+        - maxHR
+        - exerciseAngina
+        - oldpeak
+        - stSlope
+    ParkinsonsInput:
+      type: object
+      properties:
+        mdvpFo:
+          type: number
+          description: MDVP Fo(Hz) - Average vocal fundamental frequency
+        mdvpFhi:
+          type: number
+          description: MDVP Fhi(Hz) - Maximum vocal fundamental frequency
+        mdvpFlo:
+          type: number
+          description: MDVP Flo(Hz) - Minimum vocal fundamental frequency
+        mdvpJitter:
+          type: number
+          description: MDVP Jitter (%) - Variation in fundamental frequency
+        mdvpShimmer:
+          type: number
+          description: MDVP Shimmer - Variation in amplitude
+        nhr:
+          type: number
+          description: NHR - Noise-to-Harmonics Ratio
+        hnr:
+          type: number
+          description: HNR - Harmonics-to-Noise Ratio
+        rpde:
+          type: number
+          description: RPDE - Recurrence period density entropy
+        dfa:
+          type: number
+          description: DFA - Signal fractal scaling exponent
+        spread1:
+          type: number
+          description: Spread1 - Nonlinear measure of fundamental frequency variation
+        spread2:
+          type: number
+          description: Spread2 - Nonlinear measure of fundamental frequency variation
+        d2:
+          type: number
+          description: D2 - Correlation dimension
+        ppe:
+          type: number
+          description: PPE - Pitch period entropy
+      required:
+        - mdvpFo
+        - mdvpFhi
+        - mdvpFlo
+        - mdvpJitter
+        - mdvpShimmer
+        - nhr
+        - hnr
+        - rpde
+        - dfa
+        - spread1
+        - spread2
+        - d2
+        - ppe
+    PredictionResult:
+      type: object
+      properties:
+        prediction:
+          type: string
+          enum: [positive, negative]
+        probability:
+          type: number
+          description: Confidence score (0-1)
+        riskLevel:
+          type: string
+          enum: [low, moderate, high]
+        message:
+          type: string
+          description: Human-readable result message
+        details:
+          type: string
+          description: Additional details about the prediction
+      required:
+        - prediction
+        - probability
+        - riskLevel
+        - message
+        - details
+    PredictionRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        diseaseType:
+          type: string
+          enum: [diabetes, heart, parkinsons]
+        prediction:
+          type: string
+          enum: [positive, negative]
+        probability:
+          type: number
+        riskLevel:
+          type: string
+          enum: [low, moderate, high]
+        message:
+          type: string
+        createdAt:
+          type: string
+          description: ISO date string
+      required:
+        - id
+        - diseaseType
+        - prediction
+        - probability
+        - riskLevel
+        - message
+        - createdAt
