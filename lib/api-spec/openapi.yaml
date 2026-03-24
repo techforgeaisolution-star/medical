@@ -11,13 +11,14 @@ tags:
     description: Health operations
   - name: predictions
     description: Disease prediction operations
+  - name: chat
+    description: Medical chatbot operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -25,6 +26,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
   /predictions/diabetes:
     post:
       operationId: predictDiabetes
@@ -43,6 +45,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PredictionResult"
+
   /predictions/heart:
     post:
       operationId: predictHeart
@@ -61,6 +64,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PredictionResult"
+
   /predictions/parkinsons:
     post:
       operationId: predictParkinsons
@@ -79,6 +83,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PredictionResult"
+
   /predictions/history:
     get:
       operationId: getPredictionHistory
@@ -93,6 +98,100 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PredictionRecord"
+
+  /chat/sessions:
+    get:
+      operationId: getChatSessions
+      tags: [chat]
+      summary: List all chat sessions
+      responses:
+        "200":
+          description: List of chat sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatSession"
+    post:
+      operationId: createChatSession
+      tags: [chat]
+      summary: Create a new chat session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateChatSessionInput"
+      responses:
+        "201":
+          description: Created session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatSession"
+
+  /chat/sessions/{sessionId}:
+    get:
+      operationId: getChatSession
+      tags: [chat]
+      summary: Get a chat session with messages
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chat session with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatSessionWithMessages"
+    delete:
+      operationId: deleteChatSession
+      tags: [chat]
+      summary: Delete a chat session
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteResult"
+
+  /chat/sessions/{sessionId}/messages:
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a message and get AI response
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageInput"
+      responses:
+        "200":
+          description: AI response message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatMessage"
+
 components:
   schemas:
     HealthStatus:
@@ -100,148 +199,87 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
+
     DiabetesInput:
       type: object
       properties:
         pregnancies:
           type: number
-          description: Number of pregnancies
         glucose:
           type: number
-          description: Plasma glucose concentration (mg/dL)
         bloodPressure:
           type: number
-          description: Diastolic blood pressure (mm Hg)
         skinThickness:
           type: number
-          description: Triceps skin fold thickness (mm)
         insulin:
           type: number
-          description: 2-Hour serum insulin (mu U/ml)
         bmi:
           type: number
-          description: Body mass index
         diabetesPedigreeFunction:
           type: number
-          description: Diabetes pedigree function
         age:
           type: number
-          description: Age in years
-      required:
-        - pregnancies
-        - glucose
-        - bloodPressure
-        - skinThickness
-        - insulin
-        - bmi
-        - diabetesPedigreeFunction
-        - age
+      required: [pregnancies, glucose, bloodPressure, skinThickness, insulin, bmi, diabetesPedigreeFunction, age]
+
     HeartInput:
       type: object
       properties:
         age:
           type: number
-          description: Age in years
         sex:
           type: number
-          description: Sex (1 = male, 0 = female)
         chestPainType:
           type: number
-          description: Chest pain type (0-3)
         restingBP:
           type: number
-          description: Resting blood pressure (mm Hg)
         cholesterol:
           type: number
-          description: Serum cholesterol (mg/dl)
         fastingBS:
           type: number
-          description: Fasting blood sugar > 120 mg/dl (1 = true, 0 = false)
         restingECG:
           type: number
-          description: Resting ECG results (0-2)
         maxHR:
           type: number
-          description: Maximum heart rate achieved
         exerciseAngina:
           type: number
-          description: Exercise induced angina (1 = yes, 0 = no)
         oldpeak:
           type: number
-          description: ST depression induced by exercise
         stSlope:
           type: number
-          description: Slope of peak exercise ST segment (0-2)
-      required:
-        - age
-        - sex
-        - chestPainType
-        - restingBP
-        - cholesterol
-        - fastingBS
-        - restingECG
-        - maxHR
-        - exerciseAngina
-        - oldpeak
-        - stSlope
+      required: [age, sex, chestPainType, restingBP, cholesterol, fastingBS, restingECG, maxHR, exerciseAngina, oldpeak, stSlope]
+
     ParkinsonsInput:
       type: object
       properties:
         mdvpFo:
           type: number
-          description: MDVP Fo(Hz) - Average vocal fundamental frequency
         mdvpFhi:
           type: number
-          description: MDVP Fhi(Hz) - Maximum vocal fundamental frequency
         mdvpFlo:
           type: number
-          description: MDVP Flo(Hz) - Minimum vocal fundamental frequency
         mdvpJitter:
           type: number
-          description: MDVP Jitter (%) - Variation in fundamental frequency
         mdvpShimmer:
           type: number
-          description: MDVP Shimmer - Variation in amplitude
         nhr:
           type: number
-          description: NHR - Noise-to-Harmonics Ratio
         hnr:
           type: number
-          description: HNR - Harmonics-to-Noise Ratio
         rpde:
           type: number
-          description: RPDE - Recurrence period density entropy
         dfa:
           type: number
-          description: DFA - Signal fractal scaling exponent
         spread1:
           type: number
-          description: Spread1 - Nonlinear measure of fundamental frequency variation
         spread2:
           type: number
-          description: Spread2 - Nonlinear measure of fundamental frequency variation
         d2:
           type: number
-          description: D2 - Correlation dimension
         ppe:
           type: number
-          description: PPE - Pitch period entropy
-      required:
-        - mdvpFo
-        - mdvpFhi
-        - mdvpFlo
-        - mdvpJitter
-        - mdvpShimmer
-        - nhr
-        - hnr
-        - rpde
-        - dfa
-        - spread1
-        - spread2
-        - d2
-        - ppe
+      required: [mdvpFo, mdvpFhi, mdvpFlo, mdvpJitter, mdvpShimmer, nhr, hnr, rpde, dfa, spread1, spread2, d2, ppe]
+
     PredictionResult:
       type: object
       properties:
@@ -250,22 +288,15 @@ components:
           enum: [positive, negative]
         probability:
           type: number
-          description: Confidence score (0-1)
         riskLevel:
           type: string
           enum: [low, moderate, high]
         message:
           type: string
-          description: Human-readable result message
         details:
           type: string
-          description: Additional details about the prediction
-      required:
-        - prediction
-        - probability
-        - riskLevel
-        - message
-        - details
+      required: [prediction, probability, riskLevel, message, details]
+
     PredictionRecord:
       type: object
       properties:
@@ -286,12 +317,76 @@ components:
           type: string
         createdAt:
           type: string
-          description: ISO date string
-      required:
-        - id
-        - diseaseType
-        - prediction
-        - probability
-        - riskLevel
-        - message
-        - createdAt
+      required: [id, diseaseType, prediction, probability, riskLevel, message, createdAt]
+
+    ChatSession:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        preview:
+          type: string
+          description: Last message preview
+        messageCount:
+          type: number
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, preview, messageCount, createdAt, updatedAt]
+
+    ChatSessionWithMessages:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatMessage"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required: [id, title, messages, createdAt, updatedAt]
+
+    ChatMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        sessionId:
+          type: string
+        role:
+          type: string
+          enum: [user, bot]
+        content:
+          type: string
+        createdAt:
+          type: string
+      required: [id, sessionId, role, content, createdAt]
+
+    CreateChatSessionInput:
+      type: object
+      properties:
+        title:
+          type: string
+      required: [title]
+
+    SendMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+      required: [content]
+
+    DeleteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required: [success]

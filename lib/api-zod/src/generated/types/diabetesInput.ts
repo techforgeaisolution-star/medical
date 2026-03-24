@@ -7,20 +7,12 @@
  */
 
 export interface DiabetesInput {
-  /** Number of pregnancies */
   pregnancies: number;
-  /** Plasma glucose concentration (mg/dL) */
   glucose: number;
-  /** Diastolic blood pressure (mm Hg) */
   bloodPressure: number;
-  /** Triceps skin fold thickness (mm) */
   skinThickness: number;
-  /** 2-Hour serum insulin (mu U/ml) */
   insulin: number;
-  /** Body mass index */
   bmi: number;
-  /** Diabetes pedigree function */
   diabetesPedigreeFunction: number;
-  /** Age in years */
   age: number;
 }

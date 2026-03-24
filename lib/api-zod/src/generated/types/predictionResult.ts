@@ -10,11 +10,8 @@ import type { PredictionResultRiskLevel } from "./predictionResultRiskLevel";
 
 export interface PredictionResult {
   prediction: PredictionResultPrediction;
-  /** Confidence score (0-1) */
   probability: number;
   riskLevel: PredictionResultRiskLevel;
-  /** Human-readable result message */
   message: string;
-  /** Additional details about the prediction */
   details: string;
 }

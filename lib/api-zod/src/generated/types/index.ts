@@ -6,6 +6,12 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./chatMessage";
+export * from "./chatMessageRole";
+export * from "./chatSession";
+export * from "./chatSessionWithMessages";
+export * from "./createChatSessionInput";
+export * from "./deleteResult";
 export * from "./diabetesInput";
 export * from "./healthStatus";
 export * from "./heartInput";
@@ -17,3 +23,4 @@ export * from "./predictionRecordRiskLevel";
 export * from "./predictionResult";
 export * from "./predictionResultPrediction";
 export * from "./predictionResultRiskLevel";
+export * from "./sendMessageInput";

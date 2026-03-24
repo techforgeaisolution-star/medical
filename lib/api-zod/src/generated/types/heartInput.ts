@@ -7,26 +7,15 @@
  */
 
 export interface HeartInput {
-  /** Age in years */
   age: number;
-  /** Sex (1 = male, 0 = female) */
   sex: number;
-  /** Chest pain type (0-3) */
   chestPainType: number;
-  /** Resting blood pressure (mm Hg) */
   restingBP: number;
-  /** Serum cholesterol (mg/dl) */
   cholesterol: number;
-  /** Fasting blood sugar > 120 mg/dl (1 = true, 0 = false) */
   fastingBS: number;
-  /** Resting ECG results (0-2) */
   restingECG: number;
-  /** Maximum heart rate achieved */
   maxHR: number;
-  /** Exercise induced angina (1 = yes, 0 = no) */
   exerciseAngina: number;
-  /** ST depression induced by exercise */
   oldpeak: number;
-  /** Slope of peak exercise ST segment (0-2) */
   stSlope: number;
 }

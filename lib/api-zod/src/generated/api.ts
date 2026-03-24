@@ -8,7 +8,6 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
@@ -19,90 +18,74 @@ export const HealthCheckResponse = zod.object({
  * @summary Predict diabetes risk
  */
 export const PredictDiabetesBody = zod.object({
-  pregnancies: zod.number().describe("Number of pregnancies"),
-  glucose: zod.number().describe("Plasma glucose concentration (mg\/dL)"),
-  bloodPressure: zod.number().describe("Diastolic blood pressure (mm Hg)"),
-  skinThickness: zod.number().describe("Triceps skin fold thickness (mm)"),
-  insulin: zod.number().describe("2-Hour serum insulin (mu U\/ml)"),
-  bmi: zod.number().describe("Body mass index"),
-  diabetesPedigreeFunction: zod.number().describe("Diabetes pedigree function"),
-  age: zod.number().describe("Age in years"),
+  pregnancies: zod.number(),
+  glucose: zod.number(),
+  bloodPressure: zod.number(),
+  skinThickness: zod.number(),
+  insulin: zod.number(),
+  bmi: zod.number(),
+  diabetesPedigreeFunction: zod.number(),
+  age: zod.number(),
 });
 
 export const PredictDiabetesResponse = zod.object({
   prediction: zod.enum(["positive", "negative"]),
-  probability: zod.number().describe("Confidence score (0-1)"),
+  probability: zod.number(),
   riskLevel: zod.enum(["low", "moderate", "high"]),
-  message: zod.string().describe("Human-readable result message"),
-  details: zod.string().describe("Additional details about the prediction"),
+  message: zod.string(),
+  details: zod.string(),
 });
 
 /**
  * @summary Predict heart disease risk
  */
 export const PredictHeartBody = zod.object({
-  age: zod.number().describe("Age in years"),
-  sex: zod.number().describe("Sex (1 = male, 0 = female)"),
-  chestPainType: zod.number().describe("Chest pain type (0-3)"),
-  restingBP: zod.number().describe("Resting blood pressure (mm Hg)"),
-  cholesterol: zod.number().describe("Serum cholesterol (mg\/dl)"),
-  fastingBS: zod
-    .number()
-    .describe("Fasting blood sugar > 120 mg\/dl (1 = true, 0 = false)"),
-  restingECG: zod.number().describe("Resting ECG results (0-2)"),
-  maxHR: zod.number().describe("Maximum heart rate achieved"),
-  exerciseAngina: zod
-    .number()
-    .describe("Exercise induced angina (1 = yes, 0 = no)"),
-  oldpeak: zod.number().describe("ST depression induced by exercise"),
-  stSlope: zod.number().describe("Slope of peak exercise ST segment (0-2)"),
+  age: zod.number(),
+  sex: zod.number(),
+  chestPainType: zod.number(),
+  restingBP: zod.number(),
+  cholesterol: zod.number(),
+  fastingBS: zod.number(),
+  restingECG: zod.number(),
+  maxHR: zod.number(),
+  exerciseAngina: zod.number(),
+  oldpeak: zod.number(),
+  stSlope: zod.number(),
 });
 
 export const PredictHeartResponse = zod.object({
   prediction: zod.enum(["positive", "negative"]),
-  probability: zod.number().describe("Confidence score (0-1)"),
+  probability: zod.number(),
   riskLevel: zod.enum(["low", "moderate", "high"]),
-  message: zod.string().describe("Human-readable result message"),
-  details: zod.string().describe("Additional details about the prediction"),
+  message: zod.string(),
+  details: zod.string(),
 });
 
 /**
  * @summary Predict Parkinson's disease risk
  */
 export const PredictParkinsonsBody = zod.object({
-  mdvpFo: zod
-    .number()
-    .describe("MDVP Fo(Hz) - Average vocal fundamental frequency"),
-  mdvpFhi: zod
-    .number()
-    .describe("MDVP Fhi(Hz) - Maximum vocal fundamental frequency"),
-  mdvpFlo: zod
-    .number()
-    .describe("MDVP Flo(Hz) - Minimum vocal fundamental frequency"),
-  mdvpJitter: zod
-    .number()
-    .describe("MDVP Jitter (%) - Variation in fundamental frequency"),
-  mdvpShimmer: zod.number().describe("MDVP Shimmer - Variation in amplitude"),
-  nhr: zod.number().describe("NHR - Noise-to-Harmonics Ratio"),
-  hnr: zod.number().describe("HNR - Harmonics-to-Noise Ratio"),
-  rpde: zod.number().describe("RPDE - Recurrence period density entropy"),
-  dfa: zod.number().describe("DFA - Signal fractal scaling exponent"),
-  spread1: zod
-    .number()
-    .describe("Spread1 - Nonlinear measure of fundamental frequency variation"),
-  spread2: zod
-    .number()
-    .describe("Spread2 - Nonlinear measure of fundamental frequency variation"),
-  d2: zod.number().describe("D2 - Correlation dimension"),
-  ppe: zod.number().describe("PPE - Pitch period entropy"),
+  mdvpFo: zod.number(),
+  mdvpFhi: zod.number(),
+  mdvpFlo: zod.number(),
+  mdvpJitter: zod.number(),
+  mdvpShimmer: zod.number(),
+  nhr: zod.number(),
+  hnr: zod.number(),
+  rpde: zod.number(),
+  dfa: zod.number(),
+  spread1: zod.number(),
+  spread2: zod.number(),
+  d2: zod.number(),
+  ppe: zod.number(),
 });
 
 export const PredictParkinsonsResponse = zod.object({
   prediction: zod.enum(["positive", "negative"]),
-  probability: zod.number().describe("Confidence score (0-1)"),
+  probability: zod.number(),
   riskLevel: zod.enum(["low", "moderate", "high"]),
-  message: zod.string().describe("Human-readable result message"),
-  details: zod.string().describe("Additional details about the prediction"),
+  message: zod.string(),
+  details: zod.string(),
 });
 
 /**
@@ -115,8 +98,81 @@ export const GetPredictionHistoryResponseItem = zod.object({
   probability: zod.number(),
   riskLevel: zod.enum(["low", "moderate", "high"]),
   message: zod.string(),
-  createdAt: zod.string().describe("ISO date string"),
+  createdAt: zod.string(),
 });
 export const GetPredictionHistoryResponse = zod.array(
   GetPredictionHistoryResponseItem,
 );
+
+/**
+ * @summary List all chat sessions
+ */
+export const GetChatSessionsResponseItem = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  preview: zod.string().describe("Last message preview"),
+  messageCount: zod.number(),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+export const GetChatSessionsResponse = zod.array(GetChatSessionsResponseItem);
+
+/**
+ * @summary Create a new chat session
+ */
+export const CreateChatSessionBody = zod.object({
+  title: zod.string(),
+});
+
+/**
+ * @summary Get a chat session with messages
+ */
+export const GetChatSessionParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const GetChatSessionResponse = zod.object({
+  id: zod.string(),
+  title: zod.string(),
+  messages: zod.array(
+    zod.object({
+      id: zod.string(),
+      sessionId: zod.string(),
+      role: zod.enum(["user", "bot"]),
+      content: zod.string(),
+      createdAt: zod.string(),
+    }),
+  ),
+  createdAt: zod.string(),
+  updatedAt: zod.string(),
+});
+
+/**
+ * @summary Delete a chat session
+ */
+export const DeleteChatSessionParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const DeleteChatSessionResponse = zod.object({
+  success: zod.boolean(),
+});
+
+/**
+ * @summary Send a message and get AI response
+ */
+export const SendChatMessageParams = zod.object({
+  sessionId: zod.coerce.string(),
+});
+
+export const SendChatMessageBody = zod.object({
+  content: zod.string(),
+});
+
+export const SendChatMessageResponse = zod.object({
+  id: zod.string(),
+  sessionId: zod.string(),
+  role: zod.enum(["user", "bot"]),
+  content: zod.string(),
+  createdAt: zod.string(),
+});

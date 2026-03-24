@@ -10,75 +10,43 @@ export interface HealthStatus {
 }
 
 export interface DiabetesInput {
-  /** Number of pregnancies */
   pregnancies: number;
-  /** Plasma glucose concentration (mg/dL) */
   glucose: number;
-  /** Diastolic blood pressure (mm Hg) */
   bloodPressure: number;
-  /** Triceps skin fold thickness (mm) */
   skinThickness: number;
-  /** 2-Hour serum insulin (mu U/ml) */
   insulin: number;
-  /** Body mass index */
   bmi: number;
-  /** Diabetes pedigree function */
   diabetesPedigreeFunction: number;
-  /** Age in years */
   age: number;
 }
 
 export interface HeartInput {
-  /** Age in years */
   age: number;
-  /** Sex (1 = male, 0 = female) */
   sex: number;
-  /** Chest pain type (0-3) */
   chestPainType: number;
-  /** Resting blood pressure (mm Hg) */
   restingBP: number;
-  /** Serum cholesterol (mg/dl) */
   cholesterol: number;
-  /** Fasting blood sugar > 120 mg/dl (1 = true, 0 = false) */
   fastingBS: number;
-  /** Resting ECG results (0-2) */
   restingECG: number;
-  /** Maximum heart rate achieved */
   maxHR: number;
-  /** Exercise induced angina (1 = yes, 0 = no) */
   exerciseAngina: number;
-  /** ST depression induced by exercise */
   oldpeak: number;
-  /** Slope of peak exercise ST segment (0-2) */
   stSlope: number;
 }
 
 export interface ParkinsonsInput {
-  /** MDVP Fo(Hz) - Average vocal fundamental frequency */
   mdvpFo: number;
-  /** MDVP Fhi(Hz) - Maximum vocal fundamental frequency */
   mdvpFhi: number;
-  /** MDVP Flo(Hz) - Minimum vocal fundamental frequency */
   mdvpFlo: number;
-  /** MDVP Jitter (%) - Variation in fundamental frequency */
   mdvpJitter: number;
-  /** MDVP Shimmer - Variation in amplitude */
   mdvpShimmer: number;
-  /** NHR - Noise-to-Harmonics Ratio */
   nhr: number;
-  /** HNR - Harmonics-to-Noise Ratio */
   hnr: number;
-  /** RPDE - Recurrence period density entropy */
   rpde: number;
-  /** DFA - Signal fractal scaling exponent */
   dfa: number;
-  /** Spread1 - Nonlinear measure of fundamental frequency variation */
   spread1: number;
-  /** Spread2 - Nonlinear measure of fundamental frequency variation */
   spread2: number;
-  /** D2 - Correlation dimension */
   d2: number;
-  /** PPE - Pitch period entropy */
   ppe: number;
 }
 
@@ -101,12 +69,9 @@ export const PredictionResultRiskLevel = {
 
 export interface PredictionResult {
   prediction: PredictionResultPrediction;
-  /** Confidence score (0-1) */
   probability: number;
   riskLevel: PredictionResultRiskLevel;
-  /** Human-readable result message */
   message: string;
-  /** Additional details about the prediction */
   details: string;
 }
 
@@ -143,6 +108,51 @@ export interface PredictionRecord {
   probability: number;
   riskLevel: PredictionRecordRiskLevel;
   message: string;
-  /** ISO date string */
   createdAt: string;
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  /** Last message preview */
+  preview: string;
+  messageCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ChatMessageRole =
+  (typeof ChatMessageRole)[keyof typeof ChatMessageRole];
+
+export const ChatMessageRole = {
+  user: "user",
+  bot: "bot",
+} as const;
+
+export interface ChatMessage {
+  id: string;
+  sessionId: string;
+  role: ChatMessageRole;
+  content: string;
+  createdAt: string;
+}
+
+export interface ChatSessionWithMessages {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateChatSessionInput {
+  title: string;
+}
+
+export interface SendMessageInput {
+  content: string;
+}
+
+export interface DeleteResult {
+  success: boolean;
 }

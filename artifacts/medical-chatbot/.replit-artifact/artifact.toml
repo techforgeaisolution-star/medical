@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/medical-chatbot/"
+title = "Medical Chatbot"
+version = "1.0.0"
+id = "artifacts/medical-chatbot"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/medical-chatbot/" ]
+localPort = 24656
+
+[services.development]
+run = "pnpm --filter @workspace/medical-chatbot run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/medical-chatbot", "run", "build" ]
+publicDir = "artifacts/medical-chatbot/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24656"
+BASE_PATH = "/medical-chatbot/"

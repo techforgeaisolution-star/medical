@@ -16,6 +16,5 @@ export interface PredictionRecord {
   probability: number;
   riskLevel: PredictionRecordRiskLevel;
   message: string;
-  /** ISO date string */
   createdAt: string;
 }
