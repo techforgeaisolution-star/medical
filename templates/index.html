@@ -24,11 +24,9 @@
     }
 
     /* ── HERO OVERRIDES ── */
-    .hero-badge {
-      animation: fade-down 0.7s ease both;
-    }
-    .hero h1 { animation: fade-down 0.8s 0.1s ease both; }
-    .hero > p { animation: fade-down 0.8s 0.2s ease both; }
+    .hero-badge { animation: fade-down 0.7s ease both; }
+    .hero h1    { animation: fade-down 0.8s 0.1s ease both; }
+    .hero > p   { animation: fade-down 0.8s 0.2s ease both; }
     .cards-grid { animation: fade-up 0.9s 0.3s ease both; }
     .stats-row  { animation: fade-up 0.9s 0.45s ease both; }
 
@@ -64,8 +62,8 @@
       z-index: 0;
     }
     .disease-card:hover .card-glow { opacity: 1; }
-    .disease-card.blue-card .card-glow  { background: radial-gradient(ellipse at 50% 0%, rgba(79,110,247,0.18), transparent 70%); }
-    .disease-card.red-card  .card-glow  { background: radial-gradient(ellipse at 50% 0%, rgba(240,78,66,0.15), transparent 70%); }
+    .disease-card.blue-card .card-glow { background: radial-gradient(ellipse at 50% 0%, rgba(79,110,247,0.18), transparent 70%); }
+    .disease-card.red-card  .card-glow { background: radial-gradient(ellipse at 50% 0%, rgba(240,78,66,0.15), transparent 70%); }
     .disease-card > * { position: relative; z-index: 1; }
 
     /* ── CARD BADGE ── */
@@ -93,11 +91,7 @@
       padding-top: 1rem;
       border-top: 1px solid rgba(100,120,180,0.1);
     }
-    .card-accuracy {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #10c97a;
-    }
+    .card-accuracy { font-size: 0.75rem; font-weight: 700; color: #10c97a; }
     .card-dot { width: 3px; height: 3px; border-radius: 50%; background: #c8d0e8; }
     .card-fields { font-size: 0.73rem; color: #8892b0; }
     .card-arrow {
@@ -123,11 +117,7 @@
       background: radial-gradient(circle, rgba(79,110,247,0.08), transparent 70%);
       pointer-events: none;
     }
-    .stat-icon {
-      font-size: 1.4rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
+    .stat-icon { font-size: 1.4rem; margin-bottom: 0.5rem; display: block; }
 
     /* ── HOW IT WORKS SECTION ── */
     .how-section {
@@ -135,11 +125,7 @@
       border-top: 1px solid rgba(100,120,180,0.1);
       padding: 5rem 2rem;
     }
-    .how-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      text-align: center;
-    }
+    .how-inner { max-width: 960px; margin: 0 auto; text-align: center; }
     .section-label {
       display: inline-flex;
       align-items: center;
@@ -217,104 +203,7 @@
       color: #151c30;
       margin-bottom: 0.5rem;
     }
-    .step-card p {
-      font-size: 0.84rem;
-      color: #4b5680;
-      line-height: 1.55;
-    }
-
-    /* ── FOOTER UPGRADE ── */
-    footer {
-      background: #0f1422;
-      border-top: none;
-      padding: 3rem 2rem;
-      color: #8892b0;
-    }
-    .footer-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      text-align: center;
-    }
-    .footer-logo {
-      font-family: 'Fraunces', serif;
-      font-size: 1.2rem;
-      font-weight: 900;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-    }
-    .footer-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .footer-links a {
-      color: #8892b0;
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: #fff; }
-    .footer-divider {
-      width: 100%;
-      height: 1px;
-      background: rgba(255,255,255,0.07);
-    }
-    .footer-bottom {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem 1.5rem;
-      font-size: 0.78rem;
-      color: #4b5680;
-    }
-    .footer-warning {
-      background: rgba(245,158,11,0.1);
-      border: 1px solid rgba(245,158,11,0.2);
-      color: #d4a017;
-      font-size: 0.75rem;
-      padding: 0.5rem 1.2rem;
-      border-radius: 100px;
-    }
-
-    /* ── MOBILE NAV ── */
-    @media (max-width: 640px) {
-      .nav-toggle { display: flex !important; }
-      .nav-links {
-        position: fixed !important;
-        top: 66px; left: 0; right: 0;
-        flex-direction: column !important;
-        background: rgba(255,255,255,0.97) !important;
-        backdrop-filter: blur(20px);
-        padding: 1.5rem !important;
-        gap: 0.5rem !important;
-        border-bottom: 1px solid rgba(100,120,180,0.12);
-        transform: translateY(-110%) !important;
-        transition: transform 0.3s ease;
-        overflow-x: unset !important;
-        margin-left: 0 !important;
-        width: 100% !important;
-      }
-      .nav-links.active { transform: translateY(0) !important; }
-      .nav-links a { font-size: 1rem !important; padding: 0.75rem 1rem !important; border-radius: 10px; }
-      .cards-grid { grid-template-columns: 1fr !important; }
-      .steps-grid { grid-template-columns: 1fr !important; }
-      .steps-grid::before { display: none; }
-      .footer-links { gap: 1rem; }
-    }
-    @media (min-width: 641px) and (max-width: 900px) {
-      .cards-grid { grid-template-columns: 1fr 1fr !important; }
-      .steps-grid { grid-template-columns: 1fr !important; }
-      .steps-grid::before { display: none; }
-    }
+    .step-card p { font-size: 0.84rem; color: #4b5680; line-height: 1.55; }
 
     /* ── WHY TRUST US ── */
     .trust-section {
@@ -423,13 +312,9 @@
       margin-bottom: 0.6rem;
       letter-spacing: -0.01em;
     }
-    .trust-card p {
-      font-size: 0.86rem;
-      color: #8892b0;
-      line-height: 1.6;
-    }
+    .trust-card p { font-size: 0.86rem; color: #8892b0; line-height: 1.6; }
 
-    /* ── FOOTER UPGRADE ── */
+    /* ── FOOTER ── */
     footer {
       background: #080d1a;
       border-top: 1px solid rgba(255,255,255,0.05);
@@ -462,11 +347,7 @@
       max-width: 320px;
       margin-bottom: 1.1rem;
     }
-    .footer-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
+    .footer-badges { display: flex; flex-wrap: wrap; gap: 0.5rem; }
     .fbadge {
       display: inline-flex;
       align-items: center;
@@ -479,10 +360,7 @@
       padding: 0.28rem 0.7rem;
       border-radius: 100px;
     }
-    .footer-nav-group {
-      display: flex;
-      gap: 2.5rem;
-    }
+    .footer-nav-group { display: flex; gap: 2.5rem; }
     .footer-col { flex: 1; }
     .footer-col-title {
       font-size: 0.7rem;
@@ -526,6 +404,69 @@
       border-radius: 100px;
     }
 
+    /* ── NAV — critical: overflow visible so dropdown escapes ── */
+    nav { overflow: visible; }
+
+    /* ── MOBILE NAV ── */
+    @media (max-width: 640px) {
+      .nav-toggle { display: flex !important; }
+
+      .nav-links {
+        position: fixed !important;
+        top: 66px;
+        left: 0;
+        right: 0;
+        flex-direction: column !important;
+        background: rgba(255, 255, 255, 0.97) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 1rem !important;
+        gap: 0.4rem !important;
+        border-bottom: 1px solid rgba(100, 120, 180, 0.15);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        /* slide + fade animation */
+        transform: translateY(-120%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 0.3s ease, opacity 0.25s ease, visibility 0s 0.3s;
+        /* reset desktop overrides */
+        overflow-x: unset !important;
+        margin-left: 0 !important;
+        width: 100% !important;
+        z-index: 999;
+      }
+
+      .nav-links.active {
+        transform: translateY(0) !important;
+        opacity: 1;
+        visibility: visible;
+        transition: transform 0.3s ease, opacity 0.25s ease, visibility 0s 0s;
+      }
+
+      .nav-links li { width: 100%; }
+
+      .nav-links a {
+        font-size: 1rem !important;
+        padding: 0.7rem 1rem !important;
+        border-radius: 10px;
+        display: block;
+        width: 100%;
+      }
+
+      .nav-links a:hover { background: rgba(79, 110, 247, 0.07); }
+
+      .cards-grid { grid-template-columns: 1fr !important; }
+      .steps-grid { grid-template-columns: 1fr !important; }
+      .steps-grid::before { display: none; }
+      .footer-links { gap: 1rem; }
+    }
+
+    @media (min-width: 641px) and (max-width: 900px) {
+      .cards-grid { grid-template-columns: 1fr 1fr !important; }
+      .steps-grid { grid-template-columns: 1fr !important; }
+      .steps-grid::before { display: none; }
+    }
+
     @media (max-width: 768px) {
       .trust-grid { grid-template-columns: 1fr !important; }
       .footer-top { grid-template-columns: 1fr !important; gap: 2rem; }
@@ -542,7 +483,7 @@
     </span>
     DiseasePredict
   </a>
-  <button class="nav-toggle" id="navToggle" aria-label="Menu">
+  <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
     <span></span><span></span><span></span>
   </button>
   <ul class="nav-links" id="navLinks">
@@ -734,33 +675,54 @@
 </footer>
 
 <script>
-  // Mobile nav toggle
+  /* ── MOBILE NAV ── */
   const navToggle = document.getElementById('navToggle');
   const navLinks  = document.getElementById('navLinks');
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('active');
-    navLinks.classList.toggle('active');
+
+  navToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = navLinks.classList.toggle('active');
+    navToggle.classList.toggle('active', isOpen);
+    navToggle.setAttribute('aria-expanded', String(isOpen));
   });
-  document.addEventListener('click', e => {
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
     if (!navToggle.contains(e.target) && !navLinks.contains(e.target)) {
-      navToggle.classList.remove('active');
       navLinks.classList.remove('active');
+      navToggle.classList.remove('active');
+      navToggle.setAttribute('aria-expanded', 'false');
     }
   });
 
-  // Floating particles
+  // Close when a nav link is tapped (mobile UX)
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('active');
+      navToggle.classList.remove('active');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  /* ── FLOATING PARTICLES ── */
   const hero = document.getElementById('heroSection');
-  const colors = ['rgba(79,110,247,0.35)', 'rgba(124,58,237,0.3)', 'rgba(16,201,122,0.3)', 'rgba(6,182,212,0.3)'];
+  const colors = [
+    'rgba(79,110,247,0.35)',
+    'rgba(124,58,237,0.3)',
+    'rgba(16,201,122,0.3)',
+    'rgba(6,182,212,0.3)'
+  ];
   for (let i = 0; i < 18; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     const size = Math.random() * 10 + 4;
     p.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      background:${colors[Math.floor(Math.random()*colors.length)]};
-      animation-duration:${Math.random()*12+8}s;
-      animation-delay:${Math.random()*10}s;
+      width:${size}px;
+      height:${size}px;
+      left:${Math.random() * 100}%;
+      background:${colors[Math.floor(Math.random() * colors.length)]};
+      animation-duration:${Math.random() * 12 + 8}s;
+      animation-delay:${Math.random() * 10}s;
     `;
     hero.appendChild(p);
   }
